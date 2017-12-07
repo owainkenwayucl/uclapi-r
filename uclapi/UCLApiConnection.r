@@ -2,7 +2,13 @@
 UCLApiQueryJSON <- function(endpoint, parameters, apikey = Sys.getenv(c("UCLAPIKEY")),  baseurl = "https://uclapi.com/") {
     suppressPackageStartupMessages(library(RCurl))
 
-    query <- parameters
+    query <- ""
+
+    for (a in names(parameters)) {
+        b <- gsub(" ", "+", parameters[[a]])
+        query <- paste(query, "&", a, "=", b, sep="")
+    }
+    
 
     url <- paste(baseurl, endpoint, "?token=", apikey, query, sep="")
 
