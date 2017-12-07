@@ -16,3 +16,38 @@ UCLApiQueryJSON <- function(endpoint, parameters, apikey = Sys.getenv(c("UCLAPIK
 
     return(response)
 }
+
+# Perform a query against the UCL API and use jsonlite to convert this into a data frame or list.
+UCLApiQuery <- function(endpoint, parameters, apikey = Sys.getenv(c("UCLAPIKEY")),  baseurl = "https://uclapi.com/") {
+
+    suppressPackageStartupMessages(library(jsonlite))
+
+    json <- UCLApiQueryJSON(endpoint, parameters, apikey, baseurl)
+
+    objectname <- UCLApiEndpointToObject(endpoint)
+
+    result <- fromJSON(json)
+
+    if (objectname != "") {
+        result <- result[[objectname]]
+    }
+    return(result)
+}
+
+# Work out which object to pull out of the json based on the endpoint.
+UCLApiEndpointToObject <- function(endpoint) {
+    retval <- ""
+
+    endpoints <- list()
+    endpoints[["search/people"]] <- "people"
+    endpoints[["roombookings/rooms"]] <- "rooms"
+    endpoints[["roombookings/equipment"]] <- "equipment"
+    endpoints[["roombookings/bookings"]] <- "bookings"
+
+
+    if (is.element(endpoint, names(endpoints))) {
+        retval <- endpoints[[endpoint]]
+    }
+
+    return(retval)
+}
